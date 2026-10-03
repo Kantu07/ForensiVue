@@ -8,3 +8,5 @@ generated/
 *.h264
 *audit.jsonl
 custody.pdf
+reports/
+recovered/
