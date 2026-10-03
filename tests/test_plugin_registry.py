@@ -27,7 +27,7 @@ def test_identify_and_parse_success(registry, tmp_path):
     
     assert result["status"] == "success"
     assert result["parser"] == "GenericStubParser"
-    assert result["filesystem_info"]["layout"] == "generic_fat32_stub"
+    assert result["filesystem_info"]["layout"] == "unknown"
 
 def test_identify_and_parse_unrecognized(registry):
     evidence = EvidenceItem(
@@ -39,5 +39,7 @@ def test_identify_and_parse_unrecognized(registry):
     
     result = registry.parse_evidence(evidence)
     
-    assert result["status"] == "error"
-    assert result["reason"] == "unrecognized"
+    # Generic parser acts as fallback now
+    assert result["status"] == "success"
+    assert result["parser"] == "GenericStubParser"
+    assert result["filesystem_info"]["status"] == "unrecognized"

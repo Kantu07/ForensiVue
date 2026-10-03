@@ -46,7 +46,11 @@ class PluginRegistry:
         matched_parser_name = None
         parser_instance = None
         
-        for name, parser_class in self._parsers.items():
+        # Put GenericStubParser at the end
+        parsers = list(self._parsers.items())
+        parsers.sort(key=lambda x: x[0] == "GenericStubParser")
+        
+        for name, parser_class in parsers:
             parser = parser_class()
             if parser.identify(evidence):
                 matched_parser_name = name
