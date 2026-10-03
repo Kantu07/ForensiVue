@@ -1,0 +1,17 @@
+{
+    "case_id": "CLI-01",
+    "examiner": "Bot",
+    "source_path": "tests/test_acquisition.py",
+    "dest_path": "test_cli.dd",
+    "write_blocker_used": true,
+    "skip_bad_sectors": true,
+    "bad_sectors_map": [],
+    "hashes": {
+        "md5": "36d5e76e988b9ff99f50fcc1e801394d",
+        "sha256": "fe8ad438f10ccc41d7aa2dd5bdf9413824ca11a8bc80f60c2bb978463a906a91"
+    },
+    "start_time": "2026-10-03T16:46:34.463693+00:00",
+    "end_time": "2026-10-03T16:46:34.465198+00:00",
+    "tool_version": "1.0.0",
+    "total_bytes": 1638
+}
