@@ -1,0 +1,62 @@
+vendors:
+  - name: Hikvision
+    magic_bytes:
+      - offset: 512
+        value: "48494B564953494F4E" # 'HIKVISION' hex - Confirmed from public research (Partition headers)
+        weight: 0.8
+    strings:
+      - value: "HIKVISION"
+        max_search_offset: 1048576 # 1MB
+        weight: 0.5
+
+  - name: Dahua
+    magic_bytes:
+      - offset: 1024
+        value: "44484156" # 'DHAV' hex - Confirmed from public research (Frame headers)
+        weight: 0.8
+    strings:
+      - value: "dahua"
+        max_search_offset: 1048576
+        weight: 0.5
+        
+  - name: CP Plus
+    magic_bytes: []
+    strings:
+      - value: "CP PLUS" # Placeholder
+        max_search_offset: 1048576
+        weight: 0.8
+
+  - name: Honeywell
+    magic_bytes: []
+    strings:
+      - value: "HONEYWELL" # Placeholder
+        max_search_offset: 1048576
+        weight: 0.8
+
+  - name: Uniview
+    magic_bytes: []
+    strings:
+      - value: "Uniview" # Placeholder
+        max_search_offset: 1048576
+        weight: 0.8
+
+  - name: TP-Link
+    magic_bytes: []
+    strings:
+      - value: "VIGI" # Placeholder (VIGI is TP-Link's surveillance brand)
+        max_search_offset: 1048576
+        weight: 0.8
+
+  - name: Godrej
+    magic_bytes: []
+    strings:
+      - value: "GODREJ" # Placeholder
+        max_search_offset: 1048576
+        weight: 0.8
+
+  - name: Matrix
+    magic_bytes: []
+    strings:
+      - value: "MATRIX SATATYA" # Placeholder
+        max_search_offset: 1048576
+        weight: 0.8

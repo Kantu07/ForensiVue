@@ -27,3 +27,4 @@ class Recording:
     end_time: ForensicTime
     file_path: str
     metadata: Dict[str, Any]
+    status: str = "active"

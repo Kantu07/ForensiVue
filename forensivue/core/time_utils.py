@@ -38,3 +38,21 @@ def parse_dvr_time(raw_time_str: str, time_format: str = "%Y-%m-%d %H:%M:%S", of
         detected_offset=offset_str,
         utc_iso8601=dt_utc.isoformat()
     )
+
+def parse_unix_epoch(epoch: int, offset_hours: int = 0) -> ForensicTime:
+    """Parses a UNIX epoch timestamp into a ForensicTime object."""
+    # Convert epoch to naive UTC datetime, then treat as UTC
+    dt_utc = datetime.fromtimestamp(epoch, tz=timezone.utc)
+    
+    # DVRs often store local time in epoch or real epoch.
+    # Assuming the epoch is true UTC epoch for our synthetic layout.
+    dt_local = dt_utc + timedelta(hours=offset_hours)
+    
+    raw_val = dt_local.strftime("%Y-%m-%d %H:%M:%S")
+    offset_str = f"{offset_hours:+} hours"
+    
+    return ForensicTime(
+        raw_value=raw_val,
+        detected_offset=offset_str,
+        utc_iso8601=dt_utc.isoformat()
+    )

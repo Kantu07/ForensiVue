@@ -36,16 +36,20 @@ class CustodyExporter:
         
         pdf = FPDF()
         pdf.add_page()
-        pdf.set_font("Helvetica", size=10)
+        pdf.set_font("Courier", size=8)
         
         pdf.cell(0, 10, text="ForensiVue - Chain of Custody Audit Log", new_y="NEXT", new_x="LMARGIN", align="C")
         
         for log in logs:
             action = log.get('action', '')
             ts = log.get('timestamp', '')
-            details = json.dumps(log.get('details', {}))
+            details = json.dumps(log.get('details', {}), separators=(', ', ': '))
             
             line = f"[{ts}] {action}: {details}"
-            pdf.multi_cell(0, 6, text=line)
+            # Manually chunk string into 80 character pieces to avoid FPDFException
+            chunks = [line[i:i+80] for i in range(0, len(line), 80)]
+            for chunk in chunks:
+                pdf.cell(0, 6, text=chunk, new_y="NEXT", new_x="LMARGIN")
+            pdf.cell(0, 4, text="", new_y="NEXT", new_x="LMARGIN") # Spacing
             
         pdf.output(output_path)

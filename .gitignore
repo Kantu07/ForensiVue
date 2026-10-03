@@ -3,3 +3,8 @@ __pycache__/
 .pytest_cache/
 *.dd
 *.E01
+*.dd
+generated/
+*.h264
+*audit.jsonl
+custody.pdf
