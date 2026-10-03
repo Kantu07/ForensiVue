@@ -43,8 +43,16 @@ def main():
     report_parser.add_argument("--out", required=True, help="Output directory for reports")
     report_parser.add_argument("--audit-log", default="audit.jsonl", help="Audit log path")
     
+    # Serve
+    serve_parser = subparsers.add_parser("serve", help="Start FastAPI local web dashboard")
+    serve_parser.add_argument("--host", default="127.0.0.1", help="Host IP")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port")
+    
     args = parser.parse_args()
-    logger = AuditLogger(args.audit_log)
+    
+    # Safely get audit_log since some commands (like serve) might not define it
+    audit_log_path = getattr(args, "audit_log", "audit.jsonl")
+    logger = AuditLogger(audit_log_path)
     
     if args.command == "acquire":
         manager = AcquisitionManager(logger)
@@ -213,6 +221,11 @@ def main():
         
         print(f"[+] PDF Report: {pdf_out}")
         print(f"[+] HTML Report: {html_out}")
+        
+    elif args.command == "serve":
+        import uvicorn
+        print(f"[*] Starting ForensiVue Dashboard on http://{args.host}:{args.port}")
+        uvicorn.run("forensivue.api.main:app", host=args.host, port=args.port, reload=False)
 
 if __name__ == "__main__":
     main()

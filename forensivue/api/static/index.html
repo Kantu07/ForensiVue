@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForensiVue Dashboard</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --primary: #bb86fc;
+            --secondary: #03dac6;
+            --error: #cf6679;
+            --text: #ffffff;
+            --text-secondary: #aaaaaa;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #banner {
+            background-color: var(--error);
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        #sidebar {
+            width: 250px;
+            background-color: var(--surface);
+            padding-top: 50px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+        }
+        .tab-btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            transition: 0.2s;
+        }
+        .tab-btn:hover { background-color: #333; }
+        .tab-btn.active {
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            background-color: #2a2a2a;
+        }
+        #content {
+            flex-grow: 1;
+            padding: 70px 40px 40px;
+            overflow-y: auto;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        input, select, button {
+            background-color: #333;
+            color: var(--text);
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--primary);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover { background-color: #9965f4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: left;
+        }
+        th { background-color: #222; }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-success { background-color: var(--secondary); color: #000; }
+        .badge-error { background-color: var(--error); color: #fff; }
+        
+        pre {
+            background-color: #111;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="banner">SYNTHETIC DATA WARNING: Operating on test layouts, not verified vendor logic.</div>
+    
+    <div id="sidebar">
+        <button class="tab-btn active" onclick="openTab('tab-case')">1. Case Info</button>
+        <button class="tab-btn" onclick="openTab('tab-identify')">2. Identify & Parse</button>
+        <button class="tab-btn" onclick="openTab('tab-recover')">3. Recover</button>
+        <button class="tab-btn" onclick="openTab('tab-timeline')">4. Timeline</button>
+        <button class="tab-btn" onclick="openTab('tab-report')">5. Report</button>
+        <button class="tab-btn" onclick="openTab('tab-custody')">6. Custody Log</button>
+    </div>
+
+    <div id="content">
+        <!-- Case -->
+        <div id="tab-case" class="tab-content active">
+            <h2>Case Information</h2>
+            <label>Case ID:</label>
+            <input type="text" id="case-id" value="CASE-001">
+            <label>Examiner Name:</label>
+            <input type="text" id="examiner" value="Examiner Name">
+            <button onclick="saveCase()">Save Case Info</button>
+            <p id="case-msg" style="color: var(--secondary);"></p>
+        </div>
+
+        <!-- Identify -->
+        <div id="tab-identify" class="tab-content">
+            <h2>Identify & Parse</h2>
+            <label>Select Evidence Image:</label>
+            <select id="image-select"></select>
+            <button onclick="runIdentify()">Run Identification Pipeline</button>
+            
+            <div id="identify-results" style="display:none;">
+                <h3>Results</h3>
+                <p><strong>Vendor Matched:</strong> <span id="id-vendor"></span></p>
+                <p><strong>Confidence:</strong> <span id="id-conf"></span></p>
+                <p><strong>MD5:</strong> <span id="id-md5"></span> <span class="badge badge-success">Verified</span></p>
+                
+                <h3>Parsed Recordings</h3>
+                <table id="parse-table">
+                    <tr><th>ID</th><th>Channel</th><th>Start</th><th>End</th><th>Status</th></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recover -->
+        <div id="tab-recover" class="tab-content">
+            <h2>Recovery Module</h2>
+            <button onclick="runRecover()">Run Index & Signature Recovery</button>
+            <div id="recover-results" style="display:none;">
+                <h3>Recovered Clips</h3>
+                <table id="recover-table">
+                    <tr><th>Method</th><th>Original ID</th><th>Score</th><th>SHA-256</th><th>Path</th></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div id="tab-timeline" class="tab-content">
+            <h2>Unified Timeline</h2>
+            <button onclick="runTimeline()">Build Timeline</button>
+            <div id="timeline-results" style="display:none;">
+                <table id="timeline-table">
+                    <tr><th>Channel</th><th>Start (UTC)</th><th>End (UTC)</th><th>Status</th></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Report -->
+        <div id="tab-report" class="tab-content">
+            <h2>Generate Report</h2>
+            <button onclick="runReport()">Generate PDF & HTML Reports</button>
+            <div id="report-results" style="display:none; margin-top:20px;">
+                <a id="link-pdf" href="#" target="_blank" style="color:var(--primary); font-size:18px; margin-right:20px;">Download PDF</a>
+                <a id="link-html" href="#" target="_blank" style="color:var(--secondary); font-size:18px;">View HTML</a>
+            </div>
+        </div>
+
+        <!-- Custody -->
+        <div id="tab-custody" class="tab-content">
+            <h2>Audit Chain of Custody</h2>
+            <button onclick="verifyCustody()">Verify Chain</button>
+            <span id="verify-badge" class="badge" style="display:none; margin-left:10px;"></span>
+            
+            <h3>Log Tail</h3>
+            <pre id="audit-log"></pre>
+        </div>
+    </div>
+
+    <script>
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if (tabId === 'tab-identify') loadImages();
+            if (tabId === 'tab-custody') loadLog();
+        }
+
+        async function loadImages() {
+            const res = await fetch('/api/images');
+            const data = await res.json();
+            const select = document.getElementById('image-select');
+            select.innerHTML = data.images.map(img => `<option value="${img}">${img}</option>`).join('');
+        }
+        
+        function saveCase() {
+            document.getElementById('case-msg').innerText = "Case info saved in memory.";
+        }
+
+        async function runIdentify() {
+            const img = document.getElementById('image-select').value;
+            const res = await fetch('/api/pipeline/identify', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({image_path: img})
+            });
+            const data = await res.json();
+            
+            document.getElementById('identify-results').style.display = 'block';
+            document.getElementById('id-vendor').innerText = data.identification.length ? data.identification[0].vendor : "Unknown";
+            document.getElementById('id-conf').innerText = data.identification.length ? (data.identification[0].confidence * 100) + "%" : "0%";
+            document.getElementById('id-md5').innerText = data.hashes.md5;
+            
+            const table = document.getElementById('parse-table');
+            table.innerHTML = '<tr><th>ID</th><th>Channel</th><th>Start</th><th>End</th><th>Status</th></tr>' +
+                data.recordings.map(r => `<tr><td>${r.id}</td><td>${r.channel}</td><td>${r.start}</td><td>${r.end}</td><td>${r.status}</td></tr>`).join('');
+        }
+
+        async function runRecover() {
+            const img = document.getElementById('image-select').value;
+            const res = await fetch('/api/pipeline/recover', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({image_path: img})
+            });
+            const data = await res.json();
+            
+            document.getElementById('recover-results').style.display = 'block';
+            const table = document.getElementById('recover-table');
+            table.innerHTML = '<tr><th>Method</th><th>Original ID</th><th>Score</th><th>SHA-256</th><th>Path</th></tr>' +
+                data.recovered.map(r => `<tr><td>${r.method}</td><td>${r.original_id}</td><td>${r.score}</td><td style="font-size:10px;">${r.sha256}</td><td>${r.path}</td></tr>`).join('');
+        }
+
+        async function runTimeline() {
+            const img = document.getElementById('image-select').value;
+            const res = await fetch('/api/pipeline/timeline', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({image_path: img})
+            });
+            const data = await res.json();
+            
+            document.getElementById('timeline-results').style.display = 'block';
+            const table = document.getElementById('timeline-table');
+            table.innerHTML = '<tr><th>Channel</th><th>Start (UTC)</th><th>End (UTC)</th><th>Status</th></tr>' +
+                data.timeline.map(t => `<tr><td>${t.channel}</td><td>${t.adjusted_start}</td><td>${t.adjusted_end}</td><td>${t.status}</td></tr>`).join('');
+        }
+
+        async function runReport() {
+            const img = document.getElementById('image-select').value;
+            const cid = document.getElementById('case-id').value;
+            const ex = document.getElementById('examiner').value;
+            
+            const res = await fetch('/api/pipeline/report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({image_path: img, case_id: cid, examiner: ex})
+            });
+            const data = await res.json();
+            
+            document.getElementById('report-results').style.display = 'block';
+            document.getElementById('link-pdf').href = data.pdf_url;
+            document.getElementById('link-html').href = data.html_url;
+        }
+
+        async function loadLog() {
+            const res = await fetch('/api/custody/log');
+            const data = await res.json();
+            document.getElementById('audit-log').innerText = data.log;
+        }
+
+        async function verifyCustody() {
+            const res = await fetch('/api/custody/verify');
+            const data = await res.json();
+            const badge = document.getElementById('verify-badge');
+            badge.style.display = 'inline-block';
+            if (data.valid) {
+                badge.className = 'badge badge-success';
+                badge.innerText = 'VALID: Hashes Match';
+            } else {
+                badge.className = 'badge badge-error';
+                badge.innerText = 'INVALID: Tampering Detected';
+            }
+        }
+        
+        // Init
+        loadImages();
+    </script>
+</body>
+</html>
