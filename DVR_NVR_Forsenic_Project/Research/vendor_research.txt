@@ -1,0 +1,35 @@
+DVR/NVR VENDOR RESEARCH
+
+Problem:
+Different DVR/NVR manufacturers may use different proprietary
+storage formats and methods for exporting surveillance evidence.
+This makes standardized forensic acquisition and analysis difficult.
+
+Vendors identified in the problem statement:
+1. Hikvision
+2. Dahua
+3. CP Plus
+4. Honeywell
+5. TP-Link
+6. Godrej
+7. Uniview
+8. Matrix
+
+For the 2-day prototype:
+The team will demonstrate the forensic workflow using
+standard video evidence files rather than implementing
+complete proprietary filesystem recovery for every vendor.
+
+Core workflow:
+1. Evidence acquisition
+2. Evidence identification
+3. Metadata extraction
+4. SHA-256 hashing
+5. Integrity verification
+6. Video analysis
+7. Standardized forensic report
+
+Important forensic principle:
+The original evidence should be preserved and a working copy
+should be used for examination. Hashing can be used to verify
+that evidence has not been altered.

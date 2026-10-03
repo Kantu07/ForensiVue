@@ -1,0 +1,13 @@
+CAM01.mp4
+Duration: 00:00:12
+Resolution: 640 x 480
+Data Rate: 620 kbps
+Total Bitrate: 620 kbps
+Frame Rate: 30 fps
+
+CAM02.mp4
+Duration: 00:00:15
+Resolution: 640 x 480
+Data Rate: 673 kbps
+Total Bitrate: 673 kbps
+Frame Rate: 30 fps

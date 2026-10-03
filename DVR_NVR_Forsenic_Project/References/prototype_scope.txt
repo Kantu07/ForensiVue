@@ -1,0 +1,42 @@
+2-DAY PROTOTYPE SCOPE
+
+The prototype will demonstrate a standardized forensic workflow
+for surveillance video evidence.
+
+SUPPORTED FUNCTIONS
+
+1. Evidence upload/acquisition
+2. Evidence identification
+3. SHA-256 hash generation
+4. Hash/integrity verification
+5. Video metadata extraction
+6. Video playback/preview
+7. Basic video analysis
+8. Standardized forensic report generation
+
+INPUT
+
+Standard surveillance video files such as MP4.
+
+OUTPUT
+
+A forensic evidence report containing:
+
+- Evidence ID
+- File name
+- File format
+- File size
+- Duration
+- Resolution
+- Frame rate
+- SHA-256 hash
+- Integrity status
+- Analysis results
+
+LIMITATION
+
+The 2-day prototype will not claim complete proprietary
+DVR/NVR filesystem recovery for every manufacturer.
+
+Future versions can add vendor-specific acquisition,
+proprietary format parsing, and deleted-file recovery.
