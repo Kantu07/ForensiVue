@@ -6,16 +6,19 @@
     <title>ForensiVue Dashboard</title>
     <style>
         :root {
-            --bg: #121212;
-            --surface: #1e1e1e;
-            --primary: #bb86fc;
-            --secondary: #03dac6;
-            --error: #cf6679;
-            --text: #ffffff;
-            --text-secondary: #aaaaaa;
+            --bg: #0a192f;
+            --surface: rgba(255, 255, 255, 0.05);
+            --primary: #64ffda;
+            --secondary: #00b4d8;
+            --error: #ef233c;
+            --success: #06d6a0;
+            --text: #e6f1ff;
+            --text-secondary: #8892b0;
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
@@ -24,96 +27,293 @@
             height: 100vh;
             overflow: hidden;
         }
+
+        /* Banner */
         #banner {
             background-color: var(--error);
             color: #fff;
             text-align: center;
-            padding: 10px;
+            padding: 4px;
+            font-size: 12px;
             font-weight: bold;
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
+            letter-spacing: 1px;
         }
+
+        /* Layout */
         #sidebar {
-            width: 250px;
-            background-color: var(--surface);
-            padding-top: 50px;
-            border-right: 1px solid #333;
-            overflow-y: auto;
+            width: 260px;
+            background: rgba(10, 25, 47, 0.85);
+            backdrop-filter: blur(10px);
+            padding-top: 40px;
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
         }
-        .tab-btn {
+        
+        .logo {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo::before {
+            content: "";
             display: block;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Stepper */
+        .stepper {
+            padding: 0 20px;
+            flex-grow: 1;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
             width: 100%;
-            padding: 15px 20px;
-            background: none;
+            padding: 15px;
+            background: transparent;
             border: none;
             color: var(--text-secondary);
             text-align: left;
-            font-size: 16px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            border-bottom: 1px solid #333;
-            transition: 0.2s;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .tab-btn:hover { background-color: #333; }
-        .tab-btn.active {
+
+        .tab-btn::before {
+            content: "";
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--text-secondary);
+            margin-right: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(100, 255, 218, 0.05);
             color: var(--primary);
-            border-left: 4px solid var(--primary);
-            background-color: #2a2a2a;
         }
+
+        .tab-btn.active {
+            color: var(--text);
+            background: rgba(100, 255, 218, 0.1);
+        }
+        
+        .tab-btn.active::before {
+            border-color: var(--primary);
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+        }
+
         #content {
             flex-grow: 1;
-            padding: 70px 40px 40px;
+            padding: 60px 40px 40px;
             overflow-y: auto;
+            position: relative;
         }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+
+        /* Glass Cards */
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Typography & Forms */
+        h2 { color: var(--primary); margin-top: 0; font-size: 22px; }
+        h3 { color: var(--text); font-size: 16px; margin-bottom: 12px; }
         
-        input, select, button {
-            background-color: #333;
+        label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        
+        input, select {
+            background: rgba(0, 0, 0, 0.2);
             color: var(--text);
-            border: 1px solid #555;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 10px;
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
             width: 100%;
             box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s;
         }
-        button {
-            background-color: var(--primary);
-            color: #000;
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        button.action-btn {
+            background: transparent;
+            color: var(--primary);
             font-weight: bold;
             cursor: pointer;
-            border: none;
+            border: 1px solid var(--primary);
+            padding: 12px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
         }
-        button:hover { background-color: #9965f4; }
-        
+        button.action-btn:hover {
+            background: rgba(100, 255, 218, 0.1);
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.2);
+        }
+
+        /* Tables */
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-top: 15px;
+            font-size: 13px;
         }
         th, td {
-            border: 1px solid #444;
-            padding: 10px;
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px;
             text-align: left;
         }
-        th { background-color: #222; }
+        th { color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+        
+        /* Badges */
         .badge {
             padding: 4px 8px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .badge-success { background-color: var(--secondary); color: #000; }
-        .badge-error { background-color: var(--error); color: #fff; }
+        .badge-success { background: rgba(6, 214, 160, 0.1); color: var(--success); border: 1px solid var(--success); }
+        .badge-error { background: rgba(239, 35, 60, 0.1); color: var(--error); border: 1px solid var(--error); }
+        .badge-info { background: rgba(0, 180, 216, 0.1); color: var(--secondary); border: 1px solid var(--secondary); }
         
+        /* Pre / Code */
         pre {
-            background-color: #111;
+            background: rgba(0, 0, 0, 0.3);
             padding: 15px;
-            border-radius: 4px;
+            border-radius: 6px;
             overflow-x: auto;
-            border: 1px solid #333;
+            border: 1px solid var(--glass-border);
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        .tab-content {
+            opacity: 0;
+            transform: translateY(10px);
+            display: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .conf-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .conf-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            height: 20px;
+            margin-bottom: 10px;
+        }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        
+        #recover-loading { display: none; margin-top: 20px; }
+
+        /* Timeline Bars */
+        .timeline-bar-wrapper {
+            position: relative;
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        .timeline-bar {
+            position: absolute;
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 6px;
+            left: 0;
+            width: 0;
+            transition: width 1s ease-out;
+        }
+
+        /* Shield & Alerts */
+        .shield-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            margin-right: 8px;
+            transition: fill 0.3s;
+        }
+        
+        .pulse-alert {
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 35, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 35, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 35, 60, 0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tab-content, .conf-bar, .timeline-bar, .pulse-alert, .skeleton {
+                transition: none !important;
+                animation: none !important;
+            }
         }
     </style>
 </head>
@@ -121,110 +321,223 @@
     <div id="banner">SYNTHETIC DATA WARNING: Operating on test layouts, not verified vendor logic.</div>
     
     <div id="sidebar">
-        <button class="tab-btn active" onclick="openTab('tab-case')">1. Case Info</button>
-        <button class="tab-btn" onclick="openTab('tab-identify')">2. Identify & Parse</button>
-        <button class="tab-btn" onclick="openTab('tab-recover')">3. Recover</button>
-        <button class="tab-btn" onclick="openTab('tab-timeline')">4. Timeline</button>
-        <button class="tab-btn" onclick="openTab('tab-report')">5. Report</button>
-        <button class="tab-btn" onclick="openTab('tab-custody')">6. Custody Log</button>
+        <div class="logo">ForensiVue</div>
+        <div class="stepper">
+            <button class="tab-btn active" onclick="openTab('tab-case')">1. Case Info</button>
+            <button class="tab-btn" onclick="openTab('tab-acquire')">2. Acquire</button>
+            <button class="tab-btn" onclick="openTab('tab-identify')">3. Identify & Parse</button>
+            <button class="tab-btn" onclick="openTab('tab-recover')">4. Recover</button>
+            <button class="tab-btn" onclick="openTab('tab-timeline')">5. Timeline</button>
+            <button class="tab-btn" onclick="openTab('tab-report')">6. Report</button>
+            <button class="tab-btn" onclick="openTab('tab-custody')">7. Custody Log</button>
+        </div>
     </div>
 
     <div id="content">
         <!-- Case -->
         <div id="tab-case" class="tab-content active">
-            <h2>Case Information</h2>
-            <label>Case ID:</label>
-            <input type="text" id="case-id" value="CASE-001">
-            <label>Examiner Name:</label>
-            <input type="text" id="examiner" value="Examiner Name">
-            <button onclick="saveCase()">Save Case Info</button>
-            <p id="case-msg" style="color: var(--secondary);"></p>
+            <div class="card">
+                <h2>Case Configuration</h2>
+                <label>Case ID</label>
+                <input type="text" id="case-id" value="CASE-001">
+                <label>Examiner Name</label>
+                <input type="text" id="examiner" value="Examiner Name">
+                <button class="action-btn" onclick="saveCase()">Initialize Workspace</button>
+                <p id="case-msg" style="color: var(--primary); font-size: 12px; margin-top: 10px;"></p>
+            </div>
+        </div>
+
+        <!-- Acquire -->
+        <div id="tab-acquire" class="tab-content">
+            <div class="card">
+                <h2>Evidence Acquisition</h2>
+                <label>Source Image</label>
+                <select id="image-select"></select>
+                <button class="action-btn" onclick="loadAcquireData()">Read Image Properties</button>
+                
+                <div id="acquire-results" style="display:none; margin-top:20px;">
+                    <h3>Image Checksums</h3>
+                    <p style="font-family: monospace; font-size:12px; color:var(--text-secondary);">
+                        <span class="badge badge-info">MD5</span> <span id="acq-md5">Waiting...</span>
+                    </p>
+                    <p style="font-family: monospace; font-size:12px; color:var(--text-secondary);">
+                        <span class="badge badge-info">SHA-256</span> <span id="acq-sha">Waiting...</span>
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Identify -->
         <div id="tab-identify" class="tab-content">
-            <h2>Identify & Parse</h2>
-            <label>Select Evidence Image:</label>
-            <select id="image-select"></select>
-            <button onclick="runIdentify()">Run Identification Pipeline</button>
-            
-            <div id="identify-results" style="display:none;">
-                <h3>Results</h3>
-                <p><strong>Vendor Matched:</strong> <span id="id-vendor"></span></p>
-                <p><strong>Confidence:</strong> <span id="id-conf"></span></p>
-                <p><strong>MD5:</strong> <span id="id-md5"></span> <span class="badge badge-success">Verified</span></p>
+            <div class="card">
+                <h2>Device Identification & Filesystem Parsing</h2>
+                <button class="action-btn" onclick="runIdentify()">Execute Parser</button>
                 
-                <h3>Parsed Recordings</h3>
-                <table id="parse-table">
-                    <tr><th>ID</th><th>Channel</th><th>Start</th><th>End</th><th>Status</th></tr>
-                </table>
+                <div id="identify-results" style="display:none; margin-top: 24px;">
+                    <div style="display: flex; gap: 20px; margin-bottom: 24px;">
+                        <div style="flex:1; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                            <label>Identified Vendor</label>
+                            <div style="font-size: 20px; font-weight: bold; color: var(--primary);" id="id-vendor">-</div>
+                        </div>
+                        <div style="flex:1; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                            <label>Confidence Score</label>
+                            <div style="font-size: 20px; font-weight: bold; color: var(--text);"><span id="id-conf-text" class="count-up">0</span>%</div>
+                            <div class="conf-bar-container"><div id="id-conf-bar" class="conf-bar"></div></div>
+                        </div>
+                    </div>
+                    
+                    <h3>Discovered Index Entries</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="parse-table">
+                            <tr><th>ID</th><th>Channel</th><th>Start (UTC)</th><th>End (UTC)</th><th>State</th></tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Recover -->
         <div id="tab-recover" class="tab-content">
-            <h2>Recovery Module</h2>
-            <button onclick="runRecover()">Run Index & Signature Recovery</button>
-            <div id="recover-results" style="display:none;">
-                <h3>Recovered Clips</h3>
-                <table id="recover-table">
-                    <tr><th>Method</th><th>Original ID</th><th>Score</th><th>SHA-256</th><th>Path</th></tr>
-                </table>
+            <div class="card">
+                <h2>Data Recovery Engine</h2>
+                <button class="action-btn" onclick="runRecover()">Initiate Carving & Index Recovery</button>
+                
+                <div id="recover-loading">
+                    <div class="skeleton" style="width: 100%"></div>
+                    <div class="skeleton" style="width: 80%"></div>
+                    <div class="skeleton" style="width: 90%"></div>
+                </div>
+
+                <div id="recover-results" style="display:none; margin-top: 24px;">
+                    <h3>Extracted Artifacts</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="recover-table">
+                            <tr><th>Method</th><th>Orig ID</th><th>Confidence</th><th>SHA-256</th><th>Path</th></tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Timeline -->
         <div id="tab-timeline" class="tab-content">
-            <h2>Unified Timeline</h2>
-            <button onclick="runTimeline()">Build Timeline</button>
-            <div id="timeline-results" style="display:none;">
-                <table id="timeline-table">
-                    <tr><th>Channel</th><th>Start (UTC)</th><th>End (UTC)</th><th>Status</th></tr>
-                </table>
+            <div class="card">
+                <h2>Unified Chronology</h2>
+                <button class="action-btn" onclick="runTimeline()">Construct Timeline</button>
+                
+                <div id="timeline-results" style="display:none; margin-top: 24px;">
+                    <div style="overflow-x: auto;">
+                        <table id="timeline-table">
+                            <tr><th>Ch</th><th>Period (UTC)</th><th>Status</th></tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Report -->
         <div id="tab-report" class="tab-content">
-            <h2>Generate Report</h2>
-            <button onclick="runReport()">Generate PDF & HTML Reports</button>
-            <div id="report-results" style="display:none; margin-top:20px;">
-                <a id="link-pdf" href="#" target="_blank" style="color:var(--primary); font-size:18px; margin-right:20px;">Download PDF</a>
-                <a id="link-html" href="#" target="_blank" style="color:var(--secondary); font-size:18px;">View HTML</a>
+            <div class="card">
+                <h2>Final Deliverables</h2>
+                <button class="action-btn" onclick="runReport()">Compile Report</button>
+                <div id="report-results" style="display:none; margin-top:20px; display:flex; gap: 15px;">
+                    <a id="link-pdf" href="#" target="_blank" style="text-decoration: none;">
+                        <button class="action-btn" style="border-color: var(--secondary); color: var(--secondary);">PDF Document</button>
+                    </a>
+                    <a id="link-html" href="#" target="_blank" style="text-decoration: none;">
+                        <button class="action-btn" style="border-color: var(--text-secondary); color: var(--text);">HTML View</button>
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Custody -->
         <div id="tab-custody" class="tab-content">
-            <h2>Audit Chain of Custody</h2>
-            <button onclick="verifyCustody()">Verify Chain</button>
-            <span id="verify-badge" class="badge" style="display:none; margin-left:10px;"></span>
-            
-            <h3>Log Tail</h3>
-            <pre id="audit-log"></pre>
+            <div class="card">
+                <h2>Chain of Custody</h2>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <button class="action-btn" onclick="verifyCustody()">Verify Integrity</button>
+                    
+                    <div id="verify-badge" style="display:none; align-items: center; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px;">
+                        <svg class="shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                        </svg>
+                        <span id="verify-text"></span>
+                    </div>
+                </div>
+                
+                <h3>Cryptographic Audit Trail (Tail)</h3>
+                <pre id="audit-log"></pre>
+            </div>
         </div>
     </div>
 
     <script>
         function openTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => {
+                t.classList.remove('active');
+            });
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            
+            // Allow display block to apply before opacity fades in
+            setTimeout(() => {
+                document.getElementById(tabId).classList.add('active');
+            }, 10);
+            
             event.currentTarget.classList.add('active');
             
-            if (tabId === 'tab-identify') loadImages();
+            if (tabId === 'tab-identify' || tabId === 'tab-acquire') {
+                if(document.getElementById('image-select').options.length === 0) loadImages();
+            }
             if (tabId === 'tab-custody') loadLog();
         }
 
         async function loadImages() {
-            const res = await fetch('/api/images');
-            const data = await res.json();
-            const select = document.getElementById('image-select');
-            select.innerHTML = data.images.map(img => `<option value="${img}">${img}</option>`).join('');
+            try {
+                const res = await fetch('/api/images');
+                const data = await res.json();
+                const select = document.getElementById('image-select');
+                select.innerHTML = data.images.map(img => `<option value="${img}">${img}</option>`).join('');
+            } catch (e) {}
         }
         
         function saveCase() {
-            document.getElementById('case-msg').innerText = "Case info saved in memory.";
+            document.getElementById('case-msg').innerText = "✓ Workspace initialized.";
+            setTimeout(() => document.getElementById('case-msg').innerText = "", 3000);
+        }
+
+        async function loadAcquireData() {
+            const img = document.getElementById('image-select').value;
+            document.getElementById('acquire-results').style.display = 'block';
+            document.getElementById('acq-md5').innerText = "Calculating...";
+            document.getElementById('acq-sha').innerText = "Calculating...";
+            
+            try {
+                const res = await fetch('/api/pipeline/identify', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({image_path: img})
+                });
+                const data = await res.json();
+                document.getElementById('acq-md5').innerText = data.hashes.md5;
+                document.getElementById('acq-sha').innerText = data.hashes.sha256;
+            } catch(e) {
+                document.getElementById('acq-md5').innerText = "Error";
+                document.getElementById('acq-sha').innerText = "Error";
+            }
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
         }
 
         async function runIdentify() {
@@ -238,15 +551,23 @@
             
             document.getElementById('identify-results').style.display = 'block';
             document.getElementById('id-vendor').innerText = data.identification.length ? data.identification[0].vendor : "Unknown";
-            document.getElementById('id-conf').innerText = data.identification.length ? (data.identification[0].confidence * 100) + "%" : "0%";
-            document.getElementById('id-md5').innerText = data.hashes.md5;
+            
+            const confValue = data.identification.length ? (data.identification[0].confidence * 100) : 0;
+            animateValue(document.getElementById('id-conf-text'), 0, confValue, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('id-conf-bar').style.width = confValue + '%';
+            }, 50);
             
             const table = document.getElementById('parse-table');
-            table.innerHTML = '<tr><th>ID</th><th>Channel</th><th>Start</th><th>End</th><th>Status</th></tr>' +
-                data.recordings.map(r => `<tr><td>${r.id}</td><td>${r.channel}</td><td>${r.start}</td><td>${r.end}</td><td>${r.status}</td></tr>`).join('');
+            table.innerHTML = '<tr><th>ID</th><th>Channel</th><th>Start (UTC)</th><th>End (UTC)</th><th>State</th></tr>' +
+                data.recordings.map(r => `<tr><td>${r.id}</td><td>${r.channel}</td><td>${r.start.replace('T',' ')}</td><td>${r.end.replace('T',' ')}</td><td><span class="badge ${r.status==='active'?'badge-success':'badge-error'}">${r.status}</span></td></tr>`).join('');
         }
 
         async function runRecover() {
+            document.getElementById('recover-loading').style.display = 'block';
+            document.getElementById('recover-results').style.display = 'none';
+            
             const img = document.getElementById('image-select').value;
             const res = await fetch('/api/pipeline/recover', {
                 method: 'POST',
@@ -255,10 +576,31 @@
             });
             const data = await res.json();
             
+            document.getElementById('recover-loading').style.display = 'none';
             document.getElementById('recover-results').style.display = 'block';
+            
             const table = document.getElementById('recover-table');
-            table.innerHTML = '<tr><th>Method</th><th>Original ID</th><th>Score</th><th>SHA-256</th><th>Path</th></tr>' +
-                data.recovered.map(r => `<tr><td>${r.method}</td><td>${r.original_id}</td><td>${r.score}</td><td style="font-size:10px;">${r.sha256}</td><td>${r.path}</td></tr>`).join('');
+            table.innerHTML = '<tr><th>Method</th><th>Orig ID</th><th>Confidence</th><th>SHA-256</th><th>Path</th></tr>' +
+                data.recovered.map(r => {
+                    const score = (r.score * 100).toFixed(0);
+                    return `<tr>
+                        <td><span class="badge badge-info">${r.method}</span></td>
+                        <td>${r.original_id}</td>
+                        <td>
+                            ${score}%
+                            <div class="conf-bar-container" style="height:4px; margin-top:4px;"><div class="conf-bar" style="width:${score}%"></div></div>
+                        </td>
+                        <td style="font-family:monospace; font-size:10px; color:var(--text-secondary);">${r.sha256}</td>
+                        <td style="font-size:11px;">${r.path}</td>
+                    </tr>`;
+                }).join('');
+                
+            // Trigger bar animations
+            setTimeout(() => {
+                document.querySelectorAll('#recover-table .conf-bar').forEach(bar => {
+                    bar.style.width = bar.style.width; // retrigger
+                });
+            }, 50);
         }
 
         async function runTimeline() {
@@ -272,8 +614,20 @@
             
             document.getElementById('timeline-results').style.display = 'block';
             const table = document.getElementById('timeline-table');
-            table.innerHTML = '<tr><th>Channel</th><th>Start (UTC)</th><th>End (UTC)</th><th>Status</th></tr>' +
-                data.timeline.map(t => `<tr><td>${t.channel}</td><td>${t.adjusted_start}</td><td>${t.adjusted_end}</td><td>${t.status}</td></tr>`).join('');
+            
+            table.innerHTML = '<tr><th>Ch</th><th>Period (UTC)</th><th>Status</th></tr>' +
+                data.timeline.map(t => {
+                    // Random width for visual channel bar since we don't have absolute layout max/min easily
+                    const w = Math.floor(Math.random() * 50) + 50; 
+                    return `<tr>
+                        <td>CH ${t.channel}</td>
+                        <td>
+                            ${t.adjusted_start.replace('T',' ')} &rarr; ${t.adjusted_end.replace('T',' ')}
+                            <div class="timeline-bar-wrapper"><div class="timeline-bar" style="width: ${w}%"></div></div>
+                        </td>
+                        <td><span class="badge ${t.status==='active'?'badge-success':'badge-error'}">${t.status}</span></td>
+                    </tr>`;
+                }).join('');
         }
 
         async function runReport() {
@@ -288,28 +642,43 @@
             });
             const data = await res.json();
             
-            document.getElementById('report-results').style.display = 'block';
+            document.getElementById('report-results').style.display = 'flex';
             document.getElementById('link-pdf').href = data.pdf_url;
             document.getElementById('link-html').href = data.html_url;
         }
 
         async function loadLog() {
-            const res = await fetch('/api/custody/log');
-            const data = await res.json();
-            document.getElementById('audit-log').innerText = data.log;
+            try {
+                const res = await fetch('/api/custody/log');
+                const data = await res.json();
+                document.getElementById('audit-log').innerText = data.log;
+            } catch(e) {}
         }
 
         async function verifyCustody() {
             const res = await fetch('/api/custody/verify');
             const data = await res.json();
+            
             const badge = document.getElementById('verify-badge');
-            badge.style.display = 'inline-block';
+            const txt = document.getElementById('verify-text');
+            const icon = badge.querySelector('.shield-icon');
+            
+            badge.style.display = 'flex';
+            badge.classList.remove('pulse-alert');
+            
             if (data.valid) {
-                badge.className = 'badge badge-success';
-                badge.innerText = 'VALID: Hashes Match';
+                badge.style.background = 'rgba(6, 214, 160, 0.1)';
+                badge.style.color = 'var(--success)';
+                badge.style.border = '1px solid var(--success)';
+                icon.style.fill = 'var(--success)';
+                txt.innerText = 'Chain Verified';
             } else {
-                badge.className = 'badge badge-error';
-                badge.innerText = 'INVALID: Tampering Detected';
+                badge.style.background = 'rgba(239, 35, 60, 0.1)';
+                badge.style.color = 'var(--error)';
+                badge.style.border = '1px solid var(--error)';
+                icon.style.fill = 'var(--error)';
+                txt.innerText = 'Tampering Detected';
+                badge.classList.add('pulse-alert');
             }
         }
         
