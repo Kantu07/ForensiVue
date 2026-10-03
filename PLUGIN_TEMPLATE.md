@@ -43,3 +43,6 @@ class MyVendorParser(BaseVendorParser):
         # Extract motion logs, timestamps, etc.
         return {}
 ```
+
+
+**WARNING:** The `HikvisionParser` and `DahuaParser` examples in this repository, as well as the synthetic generator layouts, are based on **synthetic assumptions** for testing extraction logic. They are **NOT** based on verified proprietary vendor formats. All true vendor formats are strictly closed-source and must be researched individually.

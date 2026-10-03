@@ -12,17 +12,20 @@ class GenericParser(BaseVendorParser):
         return "GenericStubParser"
 
     def identify(self, evidence: EvidenceItem) -> bool:
-        # Stub logic: recognize based on file extension
-        return evidence.path.endswith(".generic_dvr")
+        # Fallback catches all unrecognized files
+        return True
 
     def parse_filesystem(self, evidence: EvidenceItem) -> Dict[str, Any]:
+        import os
+        size = os.path.getsize(evidence.path) if os.path.exists(evidence.path) else 0
         return {
-            "layout": "generic_fat32_stub", 
-            "total_size": 1024,
-            "status": "parsed"
+            "layout": "unknown", 
+            "total_size": size,
+            "status": "unrecognized"
         }
 
     def list_recordings(self, evidence: EvidenceItem) -> List[Recording]:
+        # Never fabricate recordings we can't prove
         return []
 
     def extract_video(self, evidence: EvidenceItem, recording: Recording, output_path: str) -> str:
