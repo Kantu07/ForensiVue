@@ -8,3 +8,5 @@ custody.csv
 custody.pdf
 reports/
 recovered/
+generated/
+*.h264
