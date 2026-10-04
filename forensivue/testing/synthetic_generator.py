@@ -114,13 +114,9 @@ class SyntheticImageBuilder:
         
         self.data[corrupt_start:corrupt_end] = b'\xFF' * (corrupt_end - corrupt_start)
         
-        # Re-hash the now corrupted data so truth reflects physical state? 
-        # Actually truth should be the corrupted hash or the original?
-        # Let's say truth hash is physical hash.
-        full_data = bytearray()
-        for b in rec["blocks"]:
-            full_data.extend(self.data[b["offset"]:b["offset"]+b["length"]])
-        rec["sha256"] = hashlib.sha256(full_data).hexdigest()
+        # Store original pre-corruption hash as 'sha256' is already done in add_recording
+        # We just add a corrupted_ranges list to mark where the damage is
+        rec["corrupted_ranges"] = [{"offset": corrupt_start, "length": corrupt_end - corrupt_start}]
 
     def _write_index(self):
         # Index table starts at 4096

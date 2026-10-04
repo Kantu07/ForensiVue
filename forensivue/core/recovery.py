@@ -62,36 +62,35 @@ class RecoveryManager:
         
         with open(evidence.path, "rb") as f:
             for rec in recordings:
-                if rec.status == "deleted":
-                    offset = rec.metadata.get("synthetic_offset")
-                    length = rec.metadata.get("synthetic_length")
+                offset = rec.metadata.get("synthetic_offset")
+                length = rec.metadata.get("synthetic_length")
+                
+                if offset is not None and length is not None:
+                    f.seek(offset)
+                    data = f.read(length)
                     
-                    if offset is not None and length is not None:
-                        f.seek(offset)
-                        data = f.read(length)
-                        
-                        score = self._validate_clip_data(data)
-                        if score > 0:
-                            # We can recover this
-                            out_path = os.path.join(output_dir, f"recovered_index_{rec.recording_id}.h264")
-                            with open(out_path, "wb") as out_f:
-                                out_f.write(data)
-                                
-                            md5_val = hashlib.md5(data).hexdigest()
-                            sha256_val = hashlib.sha256(data).hexdigest()
+                    score = self._validate_clip_data(data)
+                    if score > 0:
+                        # We can recover this
+                        out_path = os.path.join(output_dir, f"recovered_index_{rec.recording_id}.h264")
+                        with open(out_path, "wb") as out_f:
+                            out_f.write(data)
                             
-                            res = {
-                                "method": "index",
-                                "original_id": rec.recording_id,
-                                "path": out_path,
-                                "score": score,
-                                "md5": md5_val,
-                                "sha256": sha256_val,
-                                "offset": offset,
-                                "length": length
-                            }
-                            recovered.append(res)
-                            self.audit_logger.log_action("INDEX_RECOVERY_SUCCESS", res)
+                        md5_val = hashlib.md5(data).hexdigest()
+                        sha256_val = hashlib.sha256(data).hexdigest()
+                        
+                        res = {
+                            "method": "index",
+                            "original_id": rec.recording_id,
+                            "path": out_path,
+                            "score": score,
+                            "md5": md5_val,
+                            "sha256": sha256_val,
+                            "offset": offset,
+                            "length": length
+                        }
+                        recovered.append(res)
+                        self.audit_logger.log_action("INDEX_RECOVERY_SUCCESS", res)
                             
         self.audit_logger.log_action("INDEX_RECOVERY_COMPLETE", {"recovered_count": len(recovered)})
         return recovered
@@ -113,10 +112,17 @@ class RecoveryManager:
         
         # 1. Identify dense data chunks separated by large zero padding
         while start < len(data):
+            zero_start = start
             while start < len(data) and data[start] == 0:
                 start += 1
             if start >= len(data):
                 break
+                
+            # Backtrack to preserve H264 NAL start codes (00 00 00 01)
+            # Only backtrack if the first non-zero byte is 0x01
+            if start < len(data) and data[start] == 1:
+                backtrack = min(3, start - zero_start)
+                start -= backtrack
                 
             end = data.find(zero_pad, start)
             if end == -1:
@@ -124,8 +130,15 @@ class RecoveryManager:
                 
             chunk_data = data[start:end]
             if b'\x00\x00\x00\x01' in chunk_data:
-                chunks.append({"offset": start, "length": end - start, "data": chunk_data})
+                # To avoid prepending disk headers, start at the first SPS NAL unit if present
+                sps_idx = chunk_data.find(b'\x00\x00\x00\x01\x67')
+                if sps_idx != -1:
+                    chunk_data = chunk_data[sps_idx:]
+                    start += sps_idx
+                chunks.append({"offset": start, "length": len(chunk_data), "data": chunk_data})
                 
+            # If we adjusted start for SPS, end was still based on the original start.
+            # Next start should be end + padding length.
             start = end + len(zero_pad)
             
         # 2. Reconstruct and Validate

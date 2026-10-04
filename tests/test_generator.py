@@ -20,7 +20,11 @@ def verify_image_consistency(img_path):
                 full_data.extend(f.read(b["length"]))
                 
             actual_hash = hashlib.sha256(full_data).hexdigest()
-            assert actual_hash == rec["sha256"], f"Hash mismatch for rec {rec['id']}"
+            if rec.get("status") == 2:  # FLAG_DAMAGED
+                # Damaged files have physically altered bytes, so hash won't match the original
+                pass
+            else:
+                assert actual_hash == rec["sha256"], f"Hash mismatch for rec {rec['id']}"
     return meta
 
 def test_synthetic_generator_normal(tmp_path):

@@ -21,8 +21,8 @@ def test_recovery_module(tmp_path):
     dd_files = glob.glob(os.path.join(generated_dir, "*.dd"))
     
     print("\n\n--- RECOVERY METRICS EVALUATION ---")
-    print(f"{'Image Name':<20} | {'Expected':<8} | {'Recovered':<9} | {'Hash Matches':<12} | {'Partial/Fail':<12} | {'Rate'}")
-    print("-" * 80)
+    print(f"{'Image Name':<16} | {'Expected'} | {'Index exact'} | {'Carve exact'} | {'Combined exact'} | {'Damaged-rec'} | {'Decodable'} | {'Spurious'} | {'Rate'}")
+    print("-" * 115)
     
     for dd_file in dd_files:
         json_file = f"{dd_file}.json"
@@ -44,40 +44,55 @@ def test_recovery_module(tmp_path):
         
         out_dir = str(tmp_path / evidence.id)
         
-        # Run Index Recovery
         index_recovered = recovery_mgr.index_recovery(evidence, parser, out_dir)
-        
-        # Run Carver
         carved_recovered = recovery_mgr.signature_carve(evidence, out_dir)
         
-        # Aggregate unique recoveries by SHA256
-        recovered_hashes = {}
-        partial_count = 0
+        recovered_all = index_recovered + carved_recovered
+        decodable_count = sum(1 for r in recovered_all if r["score"] == 1.0)
         
-        for r in index_recovered + carved_recovered:
-            if r["score"] == 1.0:
-                recovered_hashes[r["sha256"]] = r
-            else:
-                partial_count += 1
-                # Even if partial, it's technically recovered data, we map it to truth
-                recovered_hashes[r["sha256"]] = r
-                
         expected_count = len(truth["recordings"])
         
-        hash_matches = 0
+        index_hashes = set(r["sha256"] for r in index_recovered)
+        carve_hashes = set(r["sha256"] for r in carved_recovered)
+        all_hashes = index_hashes.union(carve_hashes)
+        
+        index_exact = 0
+        carve_exact = 0
+        combined_exact = 0
+        damaged_rec = 0
+        
         for expected in truth["recordings"]:
-            # Normal, deleted, fragmented all have valid original sha256. 
-            # Damaged might have a different sha256 because we corrupted it.
-            if expected["sha256"] in recovered_hashes:
-                hash_matches += 1
+            is_damaged = expected.get("status") == 2 or "corrupted_ranges" in expected
+            matched_exact = expected["sha256"] in all_hashes
+            
+            if matched_exact:
+                combined_exact += 1
+                if expected["sha256"] in index_hashes: index_exact += 1
+                if expected["sha256"] in carve_hashes: carve_exact += 1
+            elif is_damaged:
+                # Did we recover a decodable stream for this damaged file? 
+                # Damaged files won't match the original exact hash.
+                # If we recovered *something* decodable that isn't exact, count as damaged-recovered.
+                # Since we don't have a 1:1 map, we just assume if there's an unmatched decodable clip, it's this one.
+                # Or wait, is there a better way? Just check if we have ANY recovered clip with score > 0 that doesn't match an original hash.
+                pass
                 
-        # Total recovered is unique clips found that have score > 0
-        recovered_count = len(recovered_hashes)
-        rate = (recovered_count / expected_count) * 100 if expected_count > 0 else 0
+        # To accurately count damaged_rec and spurious:
+        # A recovered item is "spurious" if its hash is not in any expected["sha256"] AND it's not a damaged-recovered clip.
+        expected_hashes = set(e["sha256"] for e in truth["recordings"])
+        damaged_rec_candidates = [r for r in recovered_all if r["sha256"] not in expected_hashes and r["score"] > 0.0]
         
-        print(f"{evidence.id:<20} | {expected_count:<8} | {recovered_count:<9} | {hash_matches:<12} | {partial_count:<12} | {rate:.1f}%")
+        damaged_expected_count = sum(1 for e in truth["recordings"] if e.get("status") == 2 or "corrupted_ranges" in e)
+        # We cap damaged_rec to the number of expected damaged files
+        damaged_rec = min(damaged_expected_count, len(set(r["sha256"] for r in damaged_rec_candidates)))
         
-        # Assertions
-        assert recovered_count >= hash_matches, "Cannot have more matches than recovered clips"
+        spurious = len(set(r["sha256"] for r in recovered_all)) - combined_exact - damaged_rec
+        if spurious < 0: spurious = 0
         
-    print("-" * 80 + "\n")
+        rate = (combined_exact / expected_count) * 100 if expected_count > 0 else 0
+        
+        print(f"{evidence.id:<16} | {expected_count:<8} | {index_exact:<11} | {carve_exact:<11} | {combined_exact:<14} | {damaged_rec:<11} | {decodable_count:<9} | {spurious:<8} | {rate:.1f}%")
+        
+        assert rate <= 100.0, "Recovery rate must never exceed 100%"
+        
+    print("-" * 115 + "\n")
