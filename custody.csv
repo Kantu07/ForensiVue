@@ -1,7 +1,0 @@
-Timestamp,Action,Details,Hash
-2026-10-03T16:46:34.457078+00:00,SYSTEM_INIT,"""Audit log genesis block""",3574ae0f2e8894c36167f1fd65b3b204b7c5960976a59b605021803448dff429
-2026-10-03T16:46:34.461703+00:00,ACQUISITION_START,"{""source"": ""tests/test_acquisition.py"", ""dest"": ""test_cli.dd"", ""case_id"": ""CLI-01"", ""examiner"": ""Bot"", ""write_blocker"": true}",0e9fae7f71bed4c1edca8127a3737934abe58c40416710e946c4cab1c50c4845
-2026-10-03T16:46:34.468211+00:00,ACQUISITION_COPY_COMPLETE,"{""bytes_read"": 1638, ""hashes"": {""md5"": ""36d5e76e988b9ff99f50fcc1e801394d"", ""sha256"": ""fe8ad438f10ccc41d7aa2dd5bdf9413824ca11a8bc80f60c2bb978463a906a91""}}",950e138a2f6c60931c3fd014ac6a1a0e933793040828c94f8d399b50c87bdf63
-2026-10-03T16:46:34.470337+00:00,VERIFICATION_START,"{""dest"": ""test_cli.dd""}",1fb4ad4d2cef0a0e814248015163d9828a6a7465272341d00dbcc380bc2df143
-2026-10-03T16:46:34.473602+00:00,VERIFICATION_SUCCESS,"{""hashes"": {""md5"": ""36d5e76e988b9ff99f50fcc1e801394d"", ""sha256"": ""fe8ad438f10ccc41d7aa2dd5bdf9413824ca11a8bc80f60c2bb978463a906a91""}}",cdf346f2bc0f932633d2bca91e5f3003ee81f0cb33313a5af24ddbe94ff3442c
-2026-10-03T16:46:34.478620+00:00,ACQUISITION_COMPLETE,"{""record_path"": ""test_cli.dd.json""}",efa85ac5a10f361d8dbf18302d9d72707d5f09f40d7637886b9cb6a34d27ce21
